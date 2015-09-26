@@ -5,7 +5,7 @@ requirejs.config({
     'lodash': '../lib/bower_components/lodash/lodash.min',
     'hbs': '../lib/bower_components/require-handlebars-plugin/hbs',
     'bootstrap': '../lib/bower_components/bootstrap/dist/js/bootstrap.min',
-    'q': '../'
+    'q': '../lib/bower_components/q/q'
   },
   shim: {
     'bootstrap': ['jquery']
@@ -13,18 +13,20 @@ requirejs.config({
 });
 
 requirejs(
-  ["jquery", "hbs", "bootstrap", "get-books"],
-  function($, Handlebars, bootstrap, books) {
+  ["jquery", "hbs", "bootstrap", "get-books", "xhr1", "q"],
+  function($, Handlebars, bootstrap, books, x1, q) {
 
-    books.load(function(bookArray) {
+       x1.bookType()
+        .then(function(types){
+          books.loadBooks(books);
+        }).then(function (){
       require(['hbs!../templates/books'], function(bookTpl) {
-        $("#bookList").html(bookTpl({ books:bookArray }));
+        $("#bookList").html(bookTpl({books}));
       });
     });
+        })
 
-    /* Here's some pseudo-code for how it should look once you
-       start using promises
-
+       /*
     getBookTypes()
       .then(function(types) {
         getBooks(types);
@@ -41,6 +43,3 @@ requirejs(
 
       })
      */
-
-  }
-);
