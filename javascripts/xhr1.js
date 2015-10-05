@@ -12,7 +12,7 @@ return {
     url: "https://nss-book-store.firebaseio.com/booktypes.json"
   }).done(function(types) {
     deferred.resolve(types);
-    console.log("Ajax Call Types = ",types);
+    console.log("Ajax2-Types= ",types);
   }).fail(function(xhr, status, error){
     deferred.reject(error);
   });
