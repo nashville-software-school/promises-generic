@@ -5,7 +5,7 @@ requirejs.config({
     'lodash': '../lib/bower_components/lodash/lodash.min',
     'hbs': '../lib/bower_components/require-handlebars-plugin/hbs',
     'bootstrap': '../lib/bower_components/bootstrap/dist/js/bootstrap.min',
-    'q': '../'
+    'q': '../lib/bower_components/q/q'
   },
   shim: {
     'bootstrap': ['jquery']
@@ -13,34 +13,22 @@ requirejs.config({
 });
 
 requirejs(
-  ["jquery", "hbs", "bootstrap", "get-books"],
-  function($, Handlebars, bootstrap, books) {
-
-    books.load(function(bookArray) {
+  ["jquery", "hbs", "bootstrap", "get-books", "xhr1", "q"],
+  function($, Handlebars, bootstrap, books, x1, q) {
+    var allBooks;
+       books.loadBooks()
+        .then(function(books){
+          books = Object.keys( books ).map(key => books[ key ]);
+          allBooks = books;
+       return x1.bookType();
+     }).then(function(types) {
+       types = Object.keys( types ).map(key => types[ key ]);
+      var bookArray = allBooks.map(book => {
+        book.type = _.find(types, { id:book.booktype }).label;
+        return book;
+      });
       require(['hbs!../templates/books'], function(bookTpl) {
-        $("#bookList").html(bookTpl({ books:bookArray }));
+        $("#bookList").html(bookTpl({books:bookArray}));
       });
     });
-
-    /* Here's some pseudo-code for how it should look once you
-       start using promises
-
-    getBookTypes()
-      .then(function(types) {
-        getBooks(types);
-      })
-      .then(function(books) {
-        // add the type key to each book that is currently
-        // being performed in the get-books file
-
-        // then bind the template to the data
-        // (p.s. make the handlebar template a module dependency)
-        require(['hbs!../templates/books'], function(bookTpl) {
-          $("#bookList").html(bookTpl({ books:bookArray }));
-        });
-
-      })
-     */
-
-  }
-);
+  });
